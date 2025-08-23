@@ -1,38 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import './PixelCard.css';
 
-interface PixelCardProps {
-  variant?: string;
-  gap?: number | null;
-  speed?: number | null;
-  colors?: string | null;
-  noFocus?: boolean | null;
-  className?: string;
-  onClick?: () => void;
-  children: React.ReactNode;
-}
-
 class Pixel {
-  width: number;
-  height: number;
-  ctx: CanvasRenderingContext2D;
-  x: number;
-  y: number;
-  color: string;
-  speed: number;
-  size: number;
-  sizeStep: number;
-  minSize: number;
-  maxSizeInteger: number;
-  maxSize: number;
-  delay: number;
-  counter: number;
-  counterStep: number;
-  isIdle: boolean;
-  isReverse: boolean;
-  isShimmer: boolean;
-
-  constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, x: number, y: number, color: string, speed: number, delay: number) {
+  constructor(canvas, context, x, y, color, speed, delay) {
     this.width = canvas.width;
     this.height = canvas.height;
     this.ctx = context;
@@ -53,11 +23,11 @@ class Pixel {
     this.isShimmer = false;
   }
 
-  getRandomValue(min: number, max: number): number {
+  getRandomValue(min, max) {
     return Math.random() * (max - min) + min;
   }
 
-  draw(): void {
+  draw() {
     const centerOffset = this.maxSizeInteger * 0.5 - this.size * 0.5;
     this.ctx.fillStyle = this.color;
     this.ctx.fillRect(
@@ -68,7 +38,7 @@ class Pixel {
     );
   }
 
-  appear(): void {
+  appear() {
     this.isIdle = false;
     if (this.counter <= this.delay) {
       this.counter += this.counterStep;
@@ -85,7 +55,7 @@ class Pixel {
     this.draw();
   }
 
-  disappear(): void {
+  disappear() {
     this.isShimmer = false;
     this.counter = 0;
     if (this.size <= 0) {
@@ -97,7 +67,7 @@ class Pixel {
     this.draw();
   }
 
-  shimmer(): void {
+  shimmer() {
     if (this.size >= this.maxSize) {
       this.isReverse = true;
     } else if (this.size <= this.minSize) {
@@ -111,11 +81,11 @@ class Pixel {
   }
 }
 
-function getEffectiveSpeed(value: number, reducedMotion: boolean): number {
+function getEffectiveSpeed(value, reducedMotion) {
   const min = 0;
   const max = 100;
   const throttle = 0.001;
-  const parsed = parseInt(value.toString(), 10);
+  const parsed = parseInt(value, 10);
 
   if (parsed <= min || reducedMotion) {
     return min;
@@ -157,54 +127,54 @@ const VARIANTS = {
   },
   calm: {
     activeColor: "#dbeafe",
-    gap: 4,
+    gap: 8,
     speed: 15,
-    colors: "#60a5fa,#3b82f6,#2563eb,#1d4ed8",
+    colors: "#dbeafe,#bfdbfe,#3b82f6",
     noFocus: false
   },
   energy: {
     activeColor: "#fed7d7",
     gap: 4,
     speed: 45,
-    colors: "#fb923c,#f97316,#ea580c,#dc2626",
+    colors: "#fed7d7,#fbb6ce,#f59e0b",
     noFocus: false
   },
   focus: {
     activeColor: "#e9d5ff",
-    gap: 4,
+    gap: 6,
     speed: 30,
-    colors: "#a78bfa,#8b5cf6,#7c3aed,#6d28d9",
+    colors: "#e9d5ff,#ddd6fe,#8b5cf6",
     noFocus: false
   },
   sleep: {
     activeColor: "#e0e7ff",
-    gap: 4,
+    gap: 12,
     speed: 10,
-    colors: "#818cf8,#6366f1,#4f46e5,#4338ca",
+    colors: "#e0e7ff,#c7d2fe,#6366f1",
     noFocus: false
   }
 };
 
-const PixelCard: React.FC<PixelCardProps> = ({
+export default function PixelCard({
   variant = "default",
   gap = null,
   speed = null,
   colors = null,
   noFocus = null,
   className = "",
-  onClick,
+  onClick = undefined,
   children
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pixelsRef = useRef<Pixel[]>([]);
-  const animationRef = useRef<number | null>(null);
-  const timePreviousRef = useRef<number>(performance.now());
+}) {
+  const containerRef = useRef(null);
+  const canvasRef = useRef(null);
+  const pixelsRef = useRef([]);
+  const animationRef = useRef(null);
+  const timePreviousRef = useRef(performance.now());
   const reducedMotion = useRef(
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
   ).current;
 
-  const variantCfg = VARIANTS[variant as keyof typeof VARIANTS] || VARIANTS.default;
+  const variantCfg = VARIANTS[variant] || VARIANTS.default;
   const finalGap = gap !== null ? gap : variantCfg.gap;
   const finalSpeed = speed !== null ? speed : variantCfg.speed;
   const finalColors = colors !== null ? colors : variantCfg.colors;
@@ -231,7 +201,7 @@ const PixelCard: React.FC<PixelCardProps> = ({
 
       const colorsArray = finalColors.split(",");
       const pxs = [];
-      const gap = Math.max(parseInt(finalGap.toString(), 10), 3); // Minimum gap to prevent too many pixels
+      const gap = Math.max(parseInt(finalGap, 10), 3); // Minimum gap to prevent too many pixels
       
       // Limit the number of pixels to prevent performance issues
       const maxPixels = 500;
@@ -261,19 +231,17 @@ const PixelCard: React.FC<PixelCardProps> = ({
         }
       }
       pixelsRef.current = pxs;
-
+      console.log('PixelCard initialized with', pxs.length, 'pixels, variant:', variant, 'colors:', finalColors);
     } catch (error) {
       console.warn('PixelCard initPixels error:', error);
       pixelsRef.current = [];
     }
   };
 
-  const doAnimate = (fnName: 'appear' | 'disappear') => {
+  const doAnimate = (fnName) => {
     try {
       if (!canvasRef.current || !pixelsRef.current.length) {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
+        cancelAnimationFrame(animationRef.current);
         return;
       }
 
@@ -287,9 +255,7 @@ const PixelCard: React.FC<PixelCardProps> = ({
 
       const ctx = canvasRef.current?.getContext("2d");
       if (!ctx || !canvasRef.current) {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
+        cancelAnimationFrame(animationRef.current);
         return;
       }
 
@@ -306,37 +272,33 @@ const PixelCard: React.FC<PixelCardProps> = ({
         }
       }
       if (allIdle) {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
+        cancelAnimationFrame(animationRef.current);
       }
     } catch (error) {
       console.warn('PixelCard animation error:', error);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      cancelAnimationFrame(animationRef.current);
     }
   };
 
-  const handleAnimation = (name: 'appear' | 'disappear') => {
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
+  const handleAnimation = (name) => {
+    cancelAnimationFrame(animationRef.current);
     animationRef.current = requestAnimationFrame(() => doAnimate(name));
   };
 
   const onMouseEnter = () => {
+    console.log('PixelCard hover enter, pixels:', pixelsRef.current.length);
     handleAnimation("appear");
   };
   const onMouseLeave = () => {
+    console.log('PixelCard hover leave');
     handleAnimation("disappear");
   };
-  const onFocus = (e: React.FocusEvent<HTMLDivElement>) => {
-    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+  const onFocus = (e) => {
+    if (e.currentTarget.contains(e.relatedTarget)) return;
     handleAnimation("appear");
   };
-  const onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
-    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+  const onBlur = (e) => {
+    if (e.currentTarget.contains(e.relatedTarget)) return;
     handleAnimation("disappear");
   };
 
@@ -345,7 +307,7 @@ const PixelCard: React.FC<PixelCardProps> = ({
       initPixels();
     }, 100); // Delay initialization to ensure DOM is ready
 
-    let observer: ResizeObserver | null = null;
+    let observer = null;
     try {
       observer = new ResizeObserver(() => {
         // Debounce resize events
@@ -371,9 +333,7 @@ const PixelCard: React.FC<PixelCardProps> = ({
         }
       }
       if (animationRef.current) {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
+        cancelAnimationFrame(animationRef.current);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -397,6 +357,4 @@ const PixelCard: React.FC<PixelCardProps> = ({
       {children}
     </div>
   );
-};
-
-export default PixelCard;
+}
