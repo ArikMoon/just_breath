@@ -34,7 +34,7 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
     }
   };
 
-  const getPhaseDuration = (phase: Phase): number => {
+  const getPhaseDuration = useCallback((phase: Phase): number => {
     switch (phase) {
       case 'inhale':
         return exercise.pattern.inhale;
@@ -47,9 +47,9 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
       default:
         return 0;
     }
-  };
+  }, [exercise.pattern]);
 
-  const getNextPhase = (current: Phase): Phase => {
+  const getNextPhase = useCallback((current: Phase): Phase => {
     const phases: Phase[] = ['inhale'];
     if (exercise.pattern.hold) phases.push('hold');
     phases.push('exhale');
@@ -57,7 +57,7 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
     
     const currentIndex = phases.indexOf(current);
     return phases[(currentIndex + 1) % phases.length];
-  };
+  }, [exercise.pattern]);
 
   const advancePhase = useCallback(() => {
     const nextPhase = getNextPhase(currentPhase);
@@ -68,7 +68,7 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
     if (nextPhase === 'inhale' && exercise.rounds) {
       setCurrentRound(prev => prev + 1);
     }
-  }, [currentPhase, exercise.rounds]);
+  }, [currentPhase, exercise.rounds, getNextPhase]);
 
   const shouldStop = useCallback(() => {
     if (exercise.rounds) {
@@ -98,7 +98,7 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isActive, phaseTime, currentPhase, advancePhase, shouldStop]);
+  }, [isActive, phaseTime, currentPhase, advancePhase, shouldStop, getPhaseDuration]);
 
   const handleStart = () => {
     setIsActive(true);
