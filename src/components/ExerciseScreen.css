@@ -1,0 +1,184 @@
+.exercise-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.exit-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.exit-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.exercise-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+}
+
+.time-display {
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  min-width: 80px;
+  text-align: center;
+}
+
+.exercise-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.phase-info {
+  margin-top: 3rem;
+}
+
+.phase-instruction {
+  font-size: 2.5rem;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.countdown {
+  font-size: 4rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.round-counter {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.exercise-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.control-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.control-button.primary {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #4c1d95;
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+.control-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.control-button.primary:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.control-spacer {
+  width: 64px;
+}
+
+@media (max-width: 768px) {
+  .exercise-header {
+    padding: 1rem 1.5rem;
+  }
+  
+  .exercise-title {
+    font-size: 1.3rem;
+  }
+  
+  .time-display {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .phase-instruction {
+    font-size: 2rem;
+  }
+  
+  .countdown {
+    font-size: 3rem;
+  }
+  
+  .round-counter {
+    font-size: 1rem;
+  }
+  
+  .exercise-controls {
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .control-button {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .control-button.primary {
+    width: 72px;
+    height: 72px;
+  }
+  
+  .control-spacer {
+    width: 56px;
+  }
+}

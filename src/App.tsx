@@ -1,24 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import HomeScreen from './components/HomeScreen';
+import ExerciseScreen from './components/ExerciseScreen';
+import { BreathingExercise } from './types/BreathingExercise';
 
 function App() {
+  const [currentExercise, setCurrentExercise] = useState<BreathingExercise | null>(null);
+
+  const handleStartExercise = (exercise: BreathingExercise) => {
+    setCurrentExercise(exercise);
+  };
+
+  const handleExitExercise = () => {
+    setCurrentExercise(null);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {currentExercise ? (
+        <ExerciseScreen 
+          exercise={currentExercise} 
+          onExit={handleExitExercise}
+        />
+      ) : (
+        <HomeScreen onStartExercise={handleStartExercise} />
+      )}
     </div>
   );
 }
