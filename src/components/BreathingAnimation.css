@@ -1,117 +1,252 @@
 .breathing-animation {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 240px;
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 2rem 0;
 }
 
 .breathing-circle {
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 2px solid #93c5fd;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  backdrop-filter: blur(20px);
   box-shadow: 
-    0 0 30px rgba(255, 255, 255, 0.2),
-    inset 0 0 30px rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(59, 130, 246, 0.15),
+    inset 0 2px 8px rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.breathing-circle.inhaling {
+  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+  border-color: #3b82f6;
+  box-shadow: 
+    0 12px 40px rgba(59, 130, 246, 0.25),
+    inset 0 2px 8px rgba(255, 255, 255, 0.9);
+}
+
+.breathing-circle.exhaling {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-color: #cbd5e1;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 2px 8px rgba(255, 255, 255, 0.7);
+}
+
+.breathing-circle.holding {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+  box-shadow: 
+    0 8px 32px rgba(245, 158, 11, 0.2),
+    inset 0 2px 8px rgba(255, 255, 255, 0.8);
 }
 
 .circle-inner {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
 .circle-core {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.ripple {
+/* Breathing rings */
+.breathing-ring {
   position: absolute;
-  width: 120px;
-  height: 120px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  pointer-events: none;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  animation: breathingRing 4s ease-in-out infinite;
 }
 
-.ripple-1 {
-  border-color: rgba(255, 255, 255, 0.4);
+.breathing-ring:nth-child(1) {
+  width: 200px;
+  height: 200px;
+  animation-delay: 0s;
 }
 
-.ripple-2 {
-  border-color: rgba(255, 255, 255, 0.2);
+.breathing-ring:nth-child(2) {
+  width: 220px;
+  height: 220px;
+  animation-delay: 0.5s;
 }
 
-.breathing-guide {
+.breathing-ring:nth-child(3) {
+  width: 240px;
+  height: 240px;
+  animation-delay: 1s;
+}
+
+@keyframes breathingRing {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* Progress arc */
+.progress-arc {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #3b82f6;
+  transform: rotate(-90deg);
+  transition: all 0.3s ease;
 }
 
-.guide-dot {
+/* Pulse effect for active state */
+.breathing-animation.active .breathing-circle {
+  animation: breathingPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes breathingPulse {
+  0% {
+    box-shadow: 
+      0 8px 32px rgba(59, 130, 246, 0.15),
+      inset 0 2px 8px rgba(255, 255, 255, 0.8);
+  }
+  100% {
+    box-shadow: 
+      0 12px 40px rgba(59, 130, 246, 0.25),
+      inset 0 2px 8px rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Phase indicators */
+.phase-indicators {
   position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.phase-dot {
   width: 8px;
   height: 8px;
-  background: rgba(255, 255, 255, 0.6);
   border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  margin-left: -4px;
-  margin-top: -4px;
-  transform-origin: 4px 80px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  background: #cbd5e1;
+  transition: all 0.3s ease;
 }
 
+.phase-dot.active {
+  background: #3b82f6;
+  transform: scale(1.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .breathing-animation {
-    width: 160px;
-    height: 160px;
+    width: 200px;
+    height: 200px;
   }
   
   .breathing-circle {
-    width: 100px;
-    height: 100px;
+    width: 140px;
+    height: 140px;
   }
   
   .circle-inner {
-    width: 70px;
-    height: 70px;
+    width: 90px;
+    height: 90px;
   }
   
   .circle-core {
-    width: 35px;
-    height: 35px;
+    width: 50px;
+    height: 50px;
   }
   
-  .ripple {
-    width: 100px;
-    height: 100px;
+  .breathing-ring:nth-child(1) {
+    width: 170px;
+    height: 170px;
   }
   
-  .guide-dot {
-    width: 6px;
-    height: 6px;
-    margin-left: -3px;
-    margin-top: -3px;
-    transform-origin: 3px 65px;
+  .breathing-ring:nth-child(2) {
+    width: 190px;
+    height: 190px;
+  }
+  
+  .breathing-ring:nth-child(3) {
+    width: 210px;
+    height: 210px;
+  }
+  
+  .progress-arc {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .breathing-animation {
+    width: 180px;
+    height: 180px;
+    margin: 1.5rem 0;
+  }
+  
+  .breathing-circle {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .circle-inner {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .circle-core {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .breathing-ring:nth-child(1) {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .breathing-ring:nth-child(2) {
+    width: 170px;
+    height: 170px;
+  }
+  
+  .breathing-ring:nth-child(3) {
+    width: 190px;
+    height: 190px;
+  }
+  
+  .progress-arc {
+    width: 140px;
+    height: 140px;
   }
 }

@@ -383,25 +383,29 @@ export const getCategoryInfo = (category: string) => {
       name: 'Calm',
       description: 'Relaxation and stress relief',
       icon: '😌',
-      gradient: ['#4299E1', '#38B2AC']
+      gradient: ['#dbeafe', '#bfdbfe'],
+      color: '#3b82f6'
     },
     [CATEGORIES.ENERGY]: {
       name: 'Energy',
       description: 'Boost energy and alertness',
       icon: '⚡',
-      gradient: ['#F56565', '#ED8936']
+      gradient: ['#fed7d7', '#fbb6ce'],
+      color: '#f59e0b'
     },
     [CATEGORIES.FOCUS]: {
       name: 'Focus',
       description: 'Enhance concentration',
       icon: '🎯',
-      gradient: ['#805AD5', '#9F7AEA']
+      gradient: ['#e9d5ff', '#ddd6fe'],
+      color: '#8b5cf6'
     },
     [CATEGORIES.SLEEP]: {
       name: 'Sleep',
       description: 'Prepare for rest',
       icon: '🌙',
-      gradient: ['#553C9A', '#4C51BF']
+      gradient: ['#e0e7ff', '#c7d2fe'],
+      color: '#6366f1'
     }
   };
   return categoryMap[category] || categoryMap[CATEGORIES.CALM];
