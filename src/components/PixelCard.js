@@ -182,67 +182,98 @@ export default function PixelCard({
   const initPixels = () => {
     if (!containerRef.current || !canvasRef.current) return;
 
-    const rect = containerRef.current.getBoundingClientRect();
-    const width = Math.floor(rect.width);
-    const height = Math.floor(rect.height);
-    const ctx = canvasRef.current.getContext("2d");
+    try {
+      const rect = containerRef.current.getBoundingClientRect();
+      const width = Math.floor(rect.width);
+      const height = Math.floor(rect.height);
+      
+      // Prevent infinite loops with minimum dimensions
+      if (width < 10 || height < 10) return;
+      
+      const ctx = canvasRef.current.getContext("2d");
+      if (!ctx) return;
 
-    canvasRef.current.width = width;
-    canvasRef.current.height = height;
-    canvasRef.current.style.width = `${width}px`;
-    canvasRef.current.style.height = `${height}px`;
+      canvasRef.current.width = width;
+      canvasRef.current.height = height;
+      canvasRef.current.style.width = `${width}px`;
+      canvasRef.current.style.height = `${height}px`;
 
-    const colorsArray = finalColors.split(",");
-    const pxs = [];
-    for (let x = 0; x < width; x += parseInt(finalGap, 10)) {
-      for (let y = 0; y < height; y += parseInt(finalGap, 10)) {
-        const color =
-          colorsArray[Math.floor(Math.random() * colorsArray.length)];
+      const colorsArray = finalColors.split(",");
+      const pxs = [];
+      const gap = Math.max(parseInt(finalGap, 10), 3); // Minimum gap to prevent too many pixels
+      
+      // Limit the number of pixels to prevent performance issues
+      const maxPixels = 500;
+      let pixelCount = 0;
+      
+      for (let x = 0; x < width && pixelCount < maxPixels; x += gap) {
+        for (let y = 0; y < height && pixelCount < maxPixels; y += gap) {
+          const color = colorsArray[Math.floor(Math.random() * colorsArray.length)];
 
-        const dx = x - width / 2;
-        const dy = y - height / 2;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const delay = reducedMotion ? 0 : distance;
+          const dx = x - width / 2;
+          const dy = y - height / 2;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const delay = reducedMotion ? 0 : Math.min(distance, 200); // Cap delay
 
-        pxs.push(
-          new Pixel(
-            canvasRef.current,
-            ctx,
-            x,
-            y,
-            color,
-            getEffectiveSpeed(finalSpeed, reducedMotion),
-            delay
-          )
-        );
+          pxs.push(
+            new Pixel(
+              canvasRef.current,
+              ctx,
+              x,
+              y,
+              color,
+              getEffectiveSpeed(finalSpeed, reducedMotion),
+              delay
+            )
+          );
+          pixelCount++;
+        }
       }
+      pixelsRef.current = pxs;
+    } catch (error) {
+      console.warn('PixelCard initPixels error:', error);
+      pixelsRef.current = [];
     }
-    pixelsRef.current = pxs;
   };
 
   const doAnimate = (fnName) => {
-    animationRef.current = requestAnimationFrame(() => doAnimate(fnName));
-    const timeNow = performance.now();
-    const timePassed = timeNow - timePreviousRef.current;
-    const timeInterval = 1000 / 60;
-
-    if (timePassed < timeInterval) return;
-    timePreviousRef.current = timeNow - (timePassed % timeInterval);
-
-    const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx || !canvasRef.current) return;
-
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-    let allIdle = true;
-    for (let i = 0; i < pixelsRef.current.length; i++) {
-      const pixel = pixelsRef.current[i];
-      pixel[fnName]();
-      if (!pixel.isIdle) {
-        allIdle = false;
+    try {
+      if (!canvasRef.current || !pixelsRef.current.length) {
+        cancelAnimationFrame(animationRef.current);
+        return;
       }
-    }
-    if (allIdle) {
+
+      animationRef.current = requestAnimationFrame(() => doAnimate(fnName));
+      const timeNow = performance.now();
+      const timePassed = timeNow - timePreviousRef.current;
+      const timeInterval = 1000 / 60;
+
+      if (timePassed < timeInterval) return;
+      timePreviousRef.current = timeNow - (timePassed % timeInterval);
+
+      const ctx = canvasRef.current?.getContext("2d");
+      if (!ctx || !canvasRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+      let allIdle = true;
+      for (let i = 0; i < pixelsRef.current.length; i++) {
+        const pixel = pixelsRef.current[i];
+        if (pixel && typeof pixel[fnName] === 'function') {
+          pixel[fnName]();
+          if (!pixel.isIdle) {
+            allIdle = false;
+          }
+        }
+      }
+      if (allIdle) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    } catch (error) {
+      console.warn('PixelCard animation error:', error);
       cancelAnimationFrame(animationRef.current);
     }
   };
@@ -264,16 +295,38 @@ export default function PixelCard({
   };
 
   useEffect(() => {
-    initPixels();
-    const observer = new ResizeObserver(() => {
+    const timeoutId = setTimeout(() => {
       initPixels();
-    });
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    }, 100); // Delay initialization to ensure DOM is ready
+
+    let observer = null;
+    try {
+      observer = new ResizeObserver(() => {
+        // Debounce resize events
+        clearTimeout(timeoutId);
+        setTimeout(() => {
+          initPixels();
+        }, 150);
+      });
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
+    } catch (error) {
+      console.warn('PixelCard ResizeObserver error:', error);
     }
+
     return () => {
-      observer.disconnect();
-      cancelAnimationFrame(animationRef.current);
+      clearTimeout(timeoutId);
+      if (observer) {
+        try {
+          observer.disconnect();
+        } catch (error) {
+          console.warn('PixelCard cleanup error:', error);
+        }
+      }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalGap, finalSpeed, finalColors, finalNoFocus]);
