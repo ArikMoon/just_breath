@@ -2,8 +2,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  color: #334155;
+  background: #0f172a;
+  color: #e2e8f0;
   position: relative;
   overflow: hidden;
 }
@@ -14,32 +14,32 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  background: #ffffff;
-  border-bottom: 1px solid #f1f5f9;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
   position: relative;
   z-index: 10;
 }
 
 .exit-button {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: #1e293b;
+  border: 1px solid #475569;
   border-radius: 12px;
   width: 48px;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: #cbd5e1;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .exit-button:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: #334155;
+  border-color: #64748b;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .exercise-title {
@@ -47,13 +47,13 @@
   font-weight: 500;
   text-align: center;
   margin: 0;
-  color: #1e293b;
+  color: #f8fafc;
   flex: 1;
 }
 
 .time-display {
   font-size: 0.875rem;
-  color: #64748b;
+  color: #94a3b8;
   font-weight: 500;
 }
 
@@ -65,7 +65,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   position: relative;
 }
 
@@ -81,7 +81,7 @@
 .phase-instruction {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #1e293b;
+  color: #f8fafc;
   margin-bottom: 2rem;
   text-align: center;
   min-height: 2rem;

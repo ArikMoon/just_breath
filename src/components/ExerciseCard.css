@@ -11,11 +11,11 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: #64748b;
-  background: #f8fafc;
+  color: #94a3b8;
+  background: #334155;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #64748b;
 }
 
 .pattern {
@@ -31,13 +31,13 @@
 }
 
 .benefit-tag {
-  background: #f1f5f9;
-  color: #475569;
+  background: #334155;
+  color: #cbd5e1;
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 500;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #64748b;
 }
 
 /* Responsive adjustments for exercise details */

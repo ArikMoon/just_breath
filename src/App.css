@@ -10,16 +10,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   min-height: 100vh;
-  color: #334155;
+  color: #e2e8f0;
 }
 
 .App {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: #0f172a;
 }
 
 /* Scrollbar styling */
@@ -28,15 +28,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #1e293b;
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #475569;
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #64748b;
 }

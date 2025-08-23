@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import HomeScreen from './components/SimpleHomeScreen';
+import HomeScreen from './components/HomeScreen';
 import ExerciseScreen from './components/ExerciseScreen';
 import { BreathingExercise } from './types/BreathingExercise';
 
