@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Settings } from 'lucide-react';
 import { BreathingExercise } from '../types/BreathingExercise';
 import { breathingExercises, CATEGORIES, getCategoryInfo } from '../data/exercises';
+import PixelCard from './PixelCard';
 import './HomeScreen.css';
 
 interface HomeScreenProps {
@@ -55,45 +56,57 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStartExercise }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
       >
-        <motion.button 
-          className="quick-category-card calm"
+        <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setSelectedCategory(CATEGORIES.CALM)}
         >
-          <span className="quick-category-icon">😌</span>
-          <span className="quick-category-title">Calm</span>
-        </motion.button>
+          <PixelCard variant="calm" className="quick-category calm">
+            <div className="pixel-card-content">
+              <span className="pixel-card-icon">😌</span>
+              <span className="pixel-card-title">Calm</span>
+            </div>
+          </PixelCard>
+        </motion.div>
         
-        <motion.button 
-          className="quick-category-card energy"
+        <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setSelectedCategory(CATEGORIES.ENERGY)}
         >
-          <span className="quick-category-icon">⚡</span>
-          <span className="quick-category-title">Energy</span>
-        </motion.button>
+          <PixelCard variant="energy" className="quick-category energy">
+            <div className="pixel-card-content">
+              <span className="pixel-card-icon">⚡</span>
+              <span className="pixel-card-title">Energy</span>
+            </div>
+          </PixelCard>
+        </motion.div>
         
-        <motion.button 
-          className="quick-category-card focus"
+        <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setSelectedCategory(CATEGORIES.FOCUS)}
         >
-          <span className="quick-category-icon">🎯</span>
-          <span className="quick-category-title">Focus</span>
-        </motion.button>
+          <PixelCard variant="focus" className="quick-category focus">
+            <div className="pixel-card-content">
+              <span className="pixel-card-icon">🎯</span>
+              <span className="pixel-card-title">Focus</span>
+            </div>
+          </PixelCard>
+        </motion.div>
         
-        <motion.button 
-          className="quick-category-card sleep"
+        <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setSelectedCategory(CATEGORIES.SLEEP)}
         >
-          <span className="quick-category-icon">🌙</span>
-          <span className="quick-category-title">Sleep</span>
-        </motion.button>
+          <PixelCard variant="sleep" className="quick-category sleep">
+            <div className="pixel-card-content">
+              <span className="pixel-card-icon">🌙</span>
+              <span className="pixel-card-title">Sleep</span>
+            </div>
+          </PixelCard>
+        </motion.div>
       </motion.div>
 
       {/* Section Header */}

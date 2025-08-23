@@ -1,94 +1,33 @@
-.exercise-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  color: #334155;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-}
-
-.exercise-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
-}
-
-.card-content {
-  position: relative;
-  z-index: 2;
-}
-
-.card-header {
+/* Exercise Details within PixelCard */
+.exercise-details {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
 }
 
-.exercise-name {
-  font-size: 1.125rem;
-  font-weight: 500;
-  margin: 0;
-  line-height: 1.3;
-  color: #1e293b;
-}
-
-.category-badge {
-  background: #dbeafe;
-  color: #3b82f6;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: capitalize;
-  border: 1px solid #93c5fd;
-}
-
-.exercise-description {
-  font-size: 0.875rem;
-  color: #64748b;
-  line-height: 1.5;
-  margin-bottom: 1.25rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.card-pattern {
-  font-size: 0.875rem;
-  color: #475569;
-  font-weight: 500;
-}
-
-.card-duration {
-  font-size: 0.875rem;
-  color: #64748b;
+.detail-item {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
-.card-benefits {
-  margin-bottom: 1.25rem;
+.pattern {
+  font-weight: 600;
+  color: #3b82f6;
 }
 
-.benefits-list {
+.benefits {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin: 1rem 0;
 }
 
 .benefit-tag {
@@ -101,73 +40,25 @@
   border: 1px solid #e2e8f0;
 }
 
-.card-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.start-button {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-}
-
-.start-button:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.start-button:active {
-  transform: translateY(0);
-}
-
-/* Category-specific styling */
-.exercise-card[data-category="calm"] {
-  border-left: 4px solid #3b82f6;
-}
-
-.exercise-card[data-category="energy"] {
-  border-left: 4px solid #f59e0b;
-}
-
-.exercise-card[data-category="focus"] {
-  border-left: 4px solid #8b5cf6;
-}
-
-.exercise-card[data-category="sleep"] {
-  border-left: 4px solid #6366f1;
-}
-
-/* Responsive adjustments */
+/* Responsive adjustments for exercise details */
 @media (max-width: 480px) {
-  .exercise-card {
-    padding: 1.25rem;
-  }
-  
-  .exercise-name {
-    font-size: 1rem;
-  }
-  
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .exercise-details {
     gap: 0.5rem;
+    margin: 0.75rem 0;
   }
   
-  .start-button {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.8rem;
+  .detail-item {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .benefits {
+    gap: 0.4rem;
+    margin: 0.75rem 0;
+  }
+  
+  .benefit-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
   }
 }
