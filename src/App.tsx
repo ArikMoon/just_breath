@@ -1,29 +1,41 @@
 import React, { useState } from 'react';
 import './App.css';
 import HomeScreen from './components/HomeScreen';
+import ExerciseSetup from './components/ExerciseSetup';
 import ExerciseScreen from './components/ExerciseScreen';
 import { BreathingExercise } from './types/BreathingExercise';
+import { SessionSettings } from './themes';
+
+type View =
+  | { kind: 'home' }
+  | { kind: 'setup'; exercise: BreathingExercise }
+  | { kind: 'session'; exercise: BreathingExercise; settings: SessionSettings };
 
 function App() {
-  const [currentExercise, setCurrentExercise] = useState<BreathingExercise | null>(null);
-
-  const handleStartExercise = (exercise: BreathingExercise) => {
-    setCurrentExercise(exercise);
-  };
-
-  const handleExitExercise = () => {
-    setCurrentExercise(null);
-  };
+  const [view, setView] = useState<View>({ kind: 'home' });
 
   return (
     <div className="App">
-      {currentExercise ? (
-        <ExerciseScreen 
-          exercise={currentExercise} 
-          onExit={handleExitExercise}
+      {view.kind === 'home' && (
+        <HomeScreen
+          onStartExercise={(exercise) => setView({ kind: 'setup', exercise })}
         />
-      ) : (
-        <HomeScreen onStartExercise={handleStartExercise} />
+      )}
+      {view.kind === 'setup' && (
+        <ExerciseSetup
+          exercise={view.exercise}
+          onBack={() => setView({ kind: 'home' })}
+          onStart={(settings) =>
+            setView({ kind: 'session', exercise: view.exercise, settings })
+          }
+        />
+      )}
+      {view.kind === 'session' && (
+        <ExerciseScreen
+          exercise={view.exercise}
+          settings={view.settings}
+          onExit={() => setView({ kind: 'home' })}
+        />
       )}
     </div>
   );

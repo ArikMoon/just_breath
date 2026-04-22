@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import './BreathingAnimation.css';
+import './OrbAnimation.css';
 
-interface BreathingAnimationProps {
+export interface AnimationProps {
   phase: 'inhale' | 'hold' | 'exhale' | 'holdEmpty';
   progress: number;
   isActive: boolean;
@@ -11,7 +11,7 @@ interface BreathingAnimationProps {
 const MIN = 0.78;
 const MAX = 1.18;
 
-const BreathingAnimation: React.FC<BreathingAnimationProps> = ({ phase, progress, isActive }) => {
+const OrbAnimation: React.FC<AnimationProps> = ({ phase, progress, isActive }) => {
   const p = Math.min(1, Math.max(0, progress / 100));
 
   let scale = MIN;
@@ -19,25 +19,18 @@ const BreathingAnimation: React.FC<BreathingAnimationProps> = ({ phase, progress
   if (!isActive) {
     scale = (MIN + MAX) / 2;
     glow = 0.45;
+  } else if (phase === 'inhale') {
+    scale = MIN + (MAX - MIN) * p;
+    glow = 0.55 + 0.35 * p;
+  } else if (phase === 'hold') {
+    scale = MAX;
+    glow = 0.9;
+  } else if (phase === 'exhale') {
+    scale = MAX - (MAX - MIN) * p;
+    glow = 0.9 - 0.4 * p;
   } else {
-    switch (phase) {
-      case 'inhale':
-        scale = MIN + (MAX - MIN) * p;
-        glow = 0.55 + 0.35 * p;
-        break;
-      case 'hold':
-        scale = MAX;
-        glow = 0.9;
-        break;
-      case 'exhale':
-        scale = MAX - (MAX - MIN) * p;
-        glow = 0.9 - 0.4 * p;
-        break;
-      case 'holdEmpty':
-        scale = MIN;
-        glow = 0.5;
-        break;
-    }
+    scale = MIN;
+    glow = 0.5;
   }
 
   return (
@@ -62,4 +55,4 @@ const BreathingAnimation: React.FC<BreathingAnimationProps> = ({ phase, progress
   );
 };
 
-export default BreathingAnimation;
+export default OrbAnimation;

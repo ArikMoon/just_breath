@@ -16,12 +16,12 @@
   background:
     radial-gradient(
       70% 55% at 50% 40%,
-      color-mix(in oklab, var(--exercise-accent) 26%, var(--surface-0)) 0%,
+      var(--session-bg1, color-mix(in oklab, var(--exercise-accent) 26%, var(--surface-0))) 0%,
       var(--surface-0) 70%
     ),
     radial-gradient(
       100% 100% at 50% 100%,
-      color-mix(in oklab, var(--exercise-accent) 14%, transparent) 0%,
+      var(--session-bg2, color-mix(in oklab, var(--exercise-accent) 14%, transparent)) 0%,
       transparent 60%
     ),
     var(--surface-0);

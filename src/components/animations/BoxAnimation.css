@@ -1,0 +1,28 @@
+.box-stage {
+  width: min(68vw, 320px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.box-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.box-outline {
+  fill: none;
+  stroke: color-mix(in oklab, var(--exercise-accent, #fff) 22%, transparent);
+  stroke-width: 2;
+}
+.box-outline-active {
+  fill: none;
+  stroke: color-mix(in oklab, var(--exercise-accent, #fff) 55%, transparent);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 16px color-mix(in oklab, var(--exercise-accent, #fff) 40%, transparent));
+}
+.box-dot {
+  fill: color-mix(in oklab, var(--exercise-accent, #fff) 80%, white);
+}

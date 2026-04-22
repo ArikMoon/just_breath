@@ -2,11 +2,15 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Pause, Play, RotateCcw } from 'lucide-react';
 import { BreathingExercise } from '../types/BreathingExercise';
-import BreathingAnimation from './BreathingAnimation';
+import { SessionSettings, themeById } from '../themes';
+import OrbAnimation from './animations/OrbAnimation';
+import BoxAnimation from './animations/BoxAnimation';
+import HillAnimation from './animations/HillAnimation';
 import './ExerciseScreen.css';
 
 interface ExerciseScreenProps {
   exercise: BreathingExercise;
+  settings: SessionSettings;
   onExit: () => void;
 }
 
@@ -19,7 +23,7 @@ const PHASE_LABEL: Record<Phase, string> = {
   holdEmpty: 'Rest',
 };
 
-function accentFor(category: string): string {
+function categoryAccent(category: string): string {
   switch (category) {
     case 'calm':
       return '#7fb8ff';
@@ -34,14 +38,17 @@ function accentFor(category: string): string {
   }
 }
 
-const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => {
+const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, settings, onExit }) => {
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<Phase>('inhale');
   const [phaseTime, setPhaseTime] = useState(0);
   const [currentRound, setCurrentRound] = useState(1);
   const [totalTime, setTotalTime] = useState(0);
 
-  const accent = useMemo(() => accentFor(exercise.category), [exercise.category]);
+  const theme = useMemo(() => themeById(settings.themeId), [settings.themeId]);
+  const accent = theme.id === 'auto' ? categoryAccent(exercise.category) : theme.accent;
+  const bg1 = theme.id === 'auto' ? '' : theme.bg1;
+  const bg2 = theme.id === 'auto' ? '' : theme.bg2;
 
   const getPhaseDuration = useCallback(
     (phase: Phase): number => {
@@ -72,16 +79,16 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
     const next = phases[(idx + 1) % phases.length];
     setCurrentPhase(next);
     setPhaseTime(0);
-    if (next === 'inhale' && exercise.rounds) {
+    if (next === 'inhale' && settings.rounds) {
       setCurrentRound((r) => r + 1);
     }
-  }, [currentPhase, phases, exercise.rounds]);
+  }, [currentPhase, phases, settings.rounds]);
 
   const shouldStop = useCallback(() => {
-    if (exercise.rounds) return currentRound > exercise.rounds;
-    if (exercise.duration) return totalTime >= exercise.duration * 60;
+    if (settings.rounds && currentRound > settings.rounds) return true;
+    if (settings.durationMin && totalTime >= settings.durationMin * 60) return true;
     return false;
-  }, [currentRound, exercise.rounds, exercise.duration, totalTime]);
+  }, [currentRound, settings.rounds, settings.durationMin, totalTime]);
 
   useEffect(() => {
     if (!isActive) return;
@@ -120,10 +127,21 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
   const countdown = Math.max(0, phaseDuration - phaseTime);
   const phaseProgress = phaseDuration > 0 ? (phaseTime / phaseDuration) * 100 : 0;
 
+  const Animation =
+    settings.animation === 'box'
+      ? BoxAnimation
+      : settings.animation === 'hill'
+      ? HillAnimation
+      : OrbAnimation;
+
   return (
     <div
       className={`exercise-screen cat-${exercise.category}`}
-      style={{ ['--exercise-accent' as any]: accent }}
+      style={{
+        ['--exercise-accent' as any]: accent,
+        ['--session-bg1' as any]: bg1,
+        ['--session-bg2' as any]: bg2,
+      }}
     >
       <div className="exercise-bg" aria-hidden />
 
@@ -133,7 +151,10 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
         </button>
         <div className="exercise-meta-top">
           <span className="exercise-name-top">{exercise.name}</span>
-          <span className="time-elapsed">{formatTime(totalTime)}</span>
+          <span className="time-elapsed">
+            {formatTime(totalTime)}
+            {settings.durationMin ? ` / ${settings.durationMin}:00` : ''}
+          </span>
         </div>
         <button className="chrome-btn" onClick={handleReset} aria-label="Restart">
           <RotateCcw size={18} />
@@ -141,7 +162,7 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
       </header>
 
       <div className="stage">
-        <BreathingAnimation phase={currentPhase} progress={phaseProgress} isActive={isActive} />
+        <Animation phase={currentPhase} progress={phaseProgress} isActive={isActive} />
 
         <div className="phase-stack">
           <AnimatePresence mode="wait">
@@ -157,12 +178,12 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
             </motion.div>
           </AnimatePresence>
           <div className="phase-count">{isActive ? countdown : phaseDuration}</div>
-          {exercise.rounds ? (
+          {settings.rounds ? (
             <div className="phase-round">
-              Round {Math.min(currentRound, exercise.rounds)} of {exercise.rounds}
+              Round {Math.min(currentRound, settings.rounds)} of {settings.rounds}
             </div>
-          ) : exercise.duration ? (
-            <div className="phase-round">{exercise.duration} min session</div>
+          ) : settings.durationMin ? (
+            <div className="phase-round">{settings.durationMin} min session</div>
           ) : null}
         </div>
       </div>
@@ -176,7 +197,7 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
           {isActive ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
         </button>
         <p className="exercise-hint">
-          {isActive ? 'Follow the orb. Breathe through your nose.' : 'Tap play to begin.'}
+          {isActive ? 'Follow the guide. Breathe through your nose.' : 'Tap play to begin.'}
         </p>
       </footer>
     </div>
