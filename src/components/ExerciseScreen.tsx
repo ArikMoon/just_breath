@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Pause, Play, RotateCcw } from 'lucide-react';
 import { BreathingExercise } from '../types/BreathingExercise';
@@ -12,6 +12,28 @@ interface ExerciseScreenProps {
 
 type Phase = 'inhale' | 'hold' | 'exhale' | 'holdEmpty';
 
+const PHASE_LABEL: Record<Phase, string> = {
+  inhale: 'Inhale',
+  hold: 'Hold',
+  exhale: 'Exhale',
+  holdEmpty: 'Rest',
+};
+
+function accentFor(category: string): string {
+  switch (category) {
+    case 'calm':
+      return '#7fb8ff';
+    case 'energy':
+      return '#ffb86b';
+    case 'focus':
+      return '#c8a7ff';
+    case 'sleep':
+      return '#6e7bff';
+    default:
+      return '#a3b8ff';
+  }
+}
+
 const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => {
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<Phase>('inhale');
@@ -19,76 +41,55 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
   const [currentRound, setCurrentRound] = useState(1);
   const [totalTime, setTotalTime] = useState(0);
 
-  const getPhaseInstructions = (phase: Phase): string => {
-    switch (phase) {
-      case 'inhale':
-        return 'Breathe In';
-      case 'hold':
-        return 'Hold';
-      case 'exhale':
-        return 'Breathe Out';
-      case 'holdEmpty':
-        return 'Hold Empty';
-      default:
-        return '';
-    }
-  };
+  const accent = useMemo(() => accentFor(exercise.category), [exercise.category]);
 
-  const getPhaseDuration = useCallback((phase: Phase): number => {
-    switch (phase) {
-      case 'inhale':
-        return exercise.pattern.inhale;
-      case 'hold':
-        return exercise.pattern.hold || 0;
-      case 'exhale':
-        return exercise.pattern.exhale;
-      case 'holdEmpty':
-        return exercise.pattern.holdEmpty || 0;
-      default:
-        return 0;
-    }
-  }, [exercise.pattern]);
+  const getPhaseDuration = useCallback(
+    (phase: Phase): number => {
+      switch (phase) {
+        case 'inhale':
+          return exercise.pattern.inhale;
+        case 'hold':
+          return exercise.pattern.hold || 0;
+        case 'exhale':
+          return exercise.pattern.exhale;
+        case 'holdEmpty':
+          return exercise.pattern.holdEmpty || 0;
+      }
+    },
+    [exercise.pattern]
+  );
 
-  const getNextPhase = useCallback((current: Phase): Phase => {
-    const phases: Phase[] = ['inhale'];
-    if (exercise.pattern.hold) phases.push('hold');
-    phases.push('exhale');
-    if (exercise.pattern.holdEmpty) phases.push('holdEmpty');
-    
-    const currentIndex = phases.indexOf(current);
-    return phases[(currentIndex + 1) % phases.length];
+  const phases = useMemo<Phase[]>(() => {
+    const seq: Phase[] = ['inhale'];
+    if (exercise.pattern.hold) seq.push('hold');
+    seq.push('exhale');
+    if (exercise.pattern.holdEmpty) seq.push('holdEmpty');
+    return seq;
   }, [exercise.pattern]);
 
   const advancePhase = useCallback(() => {
-    const nextPhase = getNextPhase(currentPhase);
-    setCurrentPhase(nextPhase);
+    const idx = phases.indexOf(currentPhase);
+    const next = phases[(idx + 1) % phases.length];
+    setCurrentPhase(next);
     setPhaseTime(0);
-    
-    // If we completed a full cycle and we're back to inhale
-    if (nextPhase === 'inhale' && exercise.rounds) {
-      setCurrentRound(prev => prev + 1);
+    if (next === 'inhale' && exercise.rounds) {
+      setCurrentRound((r) => r + 1);
     }
-  }, [currentPhase, exercise.rounds, getNextPhase]);
+  }, [currentPhase, phases, exercise.rounds]);
 
   const shouldStop = useCallback(() => {
-    if (exercise.rounds) {
-      return currentRound > exercise.rounds;
-    }
-    if (exercise.duration) {
-      return totalTime >= exercise.duration * 60;
-    }
+    if (exercise.rounds) return currentRound > exercise.rounds;
+    if (exercise.duration) return totalTime >= exercise.duration * 60;
     return false;
-  }, [currentRound, exercise.rounds, totalTime, exercise.duration]);
+  }, [currentRound, exercise.rounds, exercise.duration, totalTime]);
 
   useEffect(() => {
     if (!isActive) return;
-
     const interval = setInterval(() => {
-      setPhaseTime(prev => prev + 1);
-      setTotalTime(prev => prev + 1);
-      
-      const phaseDuration = getPhaseDuration(currentPhase);
-      if (phaseTime >= phaseDuration - 1) {
+      setPhaseTime((prev) => prev + 1);
+      setTotalTime((prev) => prev + 1);
+      const dur = getPhaseDuration(currentPhase);
+      if (phaseTime >= dur - 1) {
         if (shouldStop()) {
           setIsActive(false);
           return;
@@ -96,18 +97,11 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
         advancePhase();
       }
     }, 1000);
-
     return () => clearInterval(interval);
   }, [isActive, phaseTime, currentPhase, advancePhase, shouldStop, getPhaseDuration]);
 
-  const handleStart = () => {
-    setIsActive(true);
-  };
-
-  const handlePause = () => {
-    setIsActive(false);
-  };
-
+  const handleStart = () => setIsActive(true);
+  const handlePause = () => setIsActive(false);
   const handleReset = () => {
     setIsActive(false);
     setCurrentPhase('inhale');
@@ -116,80 +110,75 @@ const ExerciseScreen: React.FC<ExerciseScreenProps> = ({ exercise, onExit }) => 
     setTotalTime(0);
   };
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${r.toString().padStart(2, '0')}`;
   };
 
   const phaseDuration = getPhaseDuration(currentPhase);
+  const countdown = Math.max(0, phaseDuration - phaseTime);
   const phaseProgress = phaseDuration > 0 ? (phaseTime / phaseDuration) * 100 : 0;
 
   return (
-    <div 
-      className="exercise-screen"
-      style={{
-        background: `linear-gradient(135deg, ${exercise.gradient[0]}, ${exercise.gradient[1]})`
-      }}
+    <div
+      className={`exercise-screen cat-${exercise.category}`}
+      style={{ ['--exercise-accent' as any]: accent }}
     >
-      <div className="exercise-header">
-        <button className="exit-button" onClick={onExit}>
-          <X size={24} />
-        </button>
-        <h2 className="exercise-title">{exercise.name}</h2>
-        <div className="time-display">{formatTime(totalTime)}</div>
-      </div>
+      <div className="exercise-bg" aria-hidden />
 
-      <div className="exercise-content">
-        <BreathingAnimation 
-          phase={currentPhase}
-          progress={phaseProgress}
-          isActive={isActive}
-        />
-        
-        <div className="phase-info">
+      <header className="exercise-header">
+        <button className="chrome-btn" onClick={onExit} aria-label="End session">
+          <X size={20} />
+        </button>
+        <div className="exercise-meta-top">
+          <span className="exercise-name-top">{exercise.name}</span>
+          <span className="time-elapsed">{formatTime(totalTime)}</span>
+        </div>
+        <button className="chrome-btn" onClick={handleReset} aria-label="Restart">
+          <RotateCcw size={18} />
+        </button>
+      </header>
+
+      <div className="stage">
+        <BreathingAnimation phase={currentPhase} progress={phaseProgress} isActive={isActive} />
+
+        <div className="phase-stack">
           <AnimatePresence mode="wait">
-            <motion.h3 
+            <motion.div
               key={currentPhase}
-              className="phase-instruction"
-              initial={{ opacity: 0, y: 20 }}
+              className="phase-label"
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35 }}
             >
-              {getPhaseInstructions(currentPhase)}
-            </motion.h3>
+              {PHASE_LABEL[currentPhase]}
+            </motion.div>
           </AnimatePresence>
-          
-          <div className="countdown">
-            {phaseDuration - phaseTime}
-          </div>
-          
-          {exercise.rounds && (
-            <div className="round-counter">
+          <div className="phase-count">{isActive ? countdown : phaseDuration}</div>
+          {exercise.rounds ? (
+            <div className="phase-round">
               Round {Math.min(currentRound, exercise.rounds)} of {exercise.rounds}
             </div>
-          )}
+          ) : exercise.duration ? (
+            <div className="phase-round">{exercise.duration} min session</div>
+          ) : null}
         </div>
       </div>
 
-      <div className="exercise-controls">
-        <button 
-          className="control-button reset"
-          onClick={handleReset}
-        >
-          <RotateCcw size={20} />
-        </button>
-        
-        <button 
-          className={`control-button primary ${isActive ? 'pause' : 'play'}`}
+      <footer className="exercise-controls">
+        <button
+          className={`primary-btn ${isActive ? 'is-active' : ''}`}
           onClick={isActive ? handlePause : handleStart}
+          aria-label={isActive ? 'Pause' : 'Start'}
         >
-          {isActive ? <Pause size={24} /> : <Play size={24} fill="currentColor" />}
+          {isActive ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
         </button>
-        
-        <div className="control-spacer" />
-      </div>
+        <p className="exercise-hint">
+          {isActive ? 'Follow the orb. Breathe through your nose.' : 'Tap play to begin.'}
+        </p>
+      </footer>
     </div>
   );
 };

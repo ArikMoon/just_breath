@@ -1,294 +1,158 @@
 .exercise-screen {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #0f172a;
-  color: #e2e8f0;
   position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  color: var(--text);
+  isolation: isolate;
   overflow: hidden;
+}
+
+.exercise-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(
+      70% 55% at 50% 40%,
+      color-mix(in oklab, var(--exercise-accent) 26%, var(--surface-0)) 0%,
+      var(--surface-0) 70%
+    ),
+    radial-gradient(
+      100% 100% at 50% 100%,
+      color-mix(in oklab, var(--exercise-accent) 14%, transparent) 0%,
+      transparent 60%
+    ),
+    var(--surface-0);
 }
 
 /* Header */
 .exercise-header {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
   align-items: center;
-  padding: 1.5rem;
-  background: #0f172a;
-  border-bottom: 1px solid #334155;
-  position: relative;
-  z-index: 10;
+  gap: 12px;
+  padding: 18px 20px;
 }
-
-.exit-button {
-  background: #1e293b;
-  border: 1px solid #475569;
-  border-radius: 12px;
-  width: 48px;
-  height: 48px;
+.chrome-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  transition: color 140ms, background 140ms, border-color 140ms;
+}
+.chrome-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-strong);
+}
+.exercise-meta-top {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: #cbd5e1;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.exit-button:hover {
-  background: #334155;
-  border-color: #64748b;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.exercise-title {
-  font-size: 1.25rem;
-  font-weight: 500;
+  gap: 2px;
   text-align: center;
-  margin: 0;
-  color: #f8fafc;
-  flex: 1;
+  min-width: 0;
 }
-
-.time-display {
-  font-size: 0.875rem;
-  color: #94a3b8;
+.exercise-name-top {
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
   font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70vw;
+}
+.time-elapsed {
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Main Content */
-.exercise-content {
-  flex: 1;
+/* Stage */
+.stage {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  position: relative;
+  gap: 36px;
+  padding: 12px 24px 20px;
 }
 
-/* Breathing Animation Container */
-.breathing-container {
+.phase-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 3rem;
-}
-
-.phase-instruction {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #f8fafc;
-  margin-bottom: 2rem;
+  gap: 6px;
   text-align: center;
-  min-height: 2rem;
 }
-
-.phase-timer {
-  font-size: 3rem;
+.phase-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.phase-count {
+  font-family: 'Jost', sans-serif;
   font-weight: 300;
-  color: #3b82f6;
-  margin-bottom: 2rem;
-  text-align: center;
-  min-height: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: clamp(56px, 12vw, 80px);
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 24px color-mix(in oklab, var(--exercise-accent) 25%, transparent);
 }
-
-/* Exercise Info */
-.exercise-info {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-.info-item {
-  text-align: center;
-  background: #ffffff;
-  padding: 1rem 1.5rem;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  min-width: 100px;
-}
-
-.info-label {
-  font-size: 0.75rem;
-  color: #64748b;
+.phase-round {
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.25rem;
-}
-
-.info-value {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
+  color: var(--text-faint);
 }
 
 /* Controls */
 .exercise-controls {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  padding: 2rem;
-  background: #ffffff;
-  border-top: 1px solid #f1f5f9;
-}
-
-.control-button {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  width: 64px;
-  height: 64px;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  color: #64748b;
-  font-size: 1.5rem;
+  gap: 14px;
+  padding: 20px 24px 32px;
 }
-
-.control-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
-  color: #3b82f6;
+.primary-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--surface-0);
+  background: color-mix(in oklab, var(--exercise-accent) 75%, white);
+  box-shadow:
+    0 12px 32px color-mix(in oklab, var(--exercise-accent) 40%, transparent),
+    inset 0 -6px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 140ms var(--ease-breath), box-shadow 140ms;
 }
-
-.control-button.primary {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
+.primary-btn:hover {
+  transform: translateY(-1px);
 }
-
-.control-button.primary:hover {
-  background: #2563eb;
-  border-color: #2563eb;
+.primary-btn:active {
+  transform: translateY(0);
 }
-
-.control-button.danger {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
+.primary-btn.is-active {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
 }
-
-.control-button.danger:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-}
-
-/* Progress Indicator */
-.progress-container {
-  position: absolute;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.5rem;
-  z-index: 5;
-}
-
-.progress-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #cbd5e1;
-  transition: all 0.3s ease;
-}
-
-.progress-dot.active {
-  background: #3b82f6;
-  transform: scale(1.2);
-}
-
-.progress-dot.completed {
-  background: #10b981;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .exercise-content {
-    padding: 1.5rem;
-  }
-  
-  .phase-instruction {
-    font-size: 1.25rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .phase-timer {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .exercise-info {
-    gap: 1rem;
-  }
-  
-  .info-item {
-    padding: 0.75rem 1rem;
-    min-width: 80px;
-  }
-  
-  .control-button {
-    width: 56px;
-    height: 56px;
-    font-size: 1.25rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .exercise-header {
-    padding: 1rem;
-  }
-  
-  .exercise-title {
-    font-size: 1.125rem;
-  }
-  
-  .exercise-content {
-    padding: 1rem;
-  }
-  
-  .phase-instruction {
-    font-size: 1.125rem;
-    margin-bottom: 1rem;
-  }
-  
-  .phase-timer {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-  
-  .exercise-info {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: center;
-  }
-  
-  .info-item {
-    padding: 0.5rem 1rem;
-  }
-  
-  .exercise-controls {
-    padding: 1.5rem;
-    gap: 0.75rem;
-  }
-  
-  .control-button {
-    width: 48px;
-    height: 48px;
-    font-size: 1.125rem;
-  }
+.exercise-hint {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+  text-align: center;
+  max-width: 28ch;
 }

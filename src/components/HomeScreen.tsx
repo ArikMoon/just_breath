@@ -1,176 +1,181 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings } from 'lucide-react';
+import { Sun, CloudSun, Moon, Star } from 'lucide-react';
 import { BreathingExercise } from '../types/BreathingExercise';
-import { breathingExercises, CATEGORIES, getCategoryInfo } from '../data/exercises';
-import PixelCard from './PixelCard';
+import { breathingExercises } from '../data/exercises';
 import './HomeScreen.css';
 
 interface HomeScreenProps {
   onStartExercise: (exercise: BreathingExercise) => void;
 }
 
+type Tab = 'all' | 'calm' | 'energy' | 'focus' | 'sleep';
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'calm', label: 'Calm' },
+  { id: 'energy', label: 'Energy' },
+  { id: 'focus', label: 'Focus' },
+  { id: 'sleep', label: 'Sleep' },
+];
+
+type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
+
+function timeOfDay(date = new Date()): TimeOfDay {
+  const h = date.getHours();
+  if (h < 5) return 'night';
+  if (h < 12) return 'morning';
+  if (h < 17) return 'afternoon';
+  if (h < 21) return 'evening';
+  return 'night';
+}
+
+function greeting(t: TimeOfDay): string {
+  switch (t) {
+    case 'morning':
+      return 'Good morning';
+    case 'afternoon':
+      return 'Good afternoon';
+    case 'evening':
+      return 'Good evening';
+    case 'night':
+      return 'Good night';
+  }
+}
+
+function recommendedFor(t: TimeOfDay): string {
+  switch (t) {
+    case 'morning':
+      return 'wim_hof';
+    case 'afternoon':
+      return 'box_breathing';
+    case 'evening':
+      return 'coherent_breathing';
+    case 'night':
+      return 'four_seven_eight';
+  }
+}
+
+function accentFor(category: string): string {
+  switch (category) {
+    case 'calm':
+      return 'var(--calm)';
+    case 'energy':
+      return 'var(--energy)';
+    case 'focus':
+      return 'var(--focus)';
+    case 'sleep':
+      return 'var(--sleep)';
+    default:
+      return 'var(--text-dim)';
+  }
+}
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ onStartExercise }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [tab, setTab] = useState<Tab>('all');
+  const tod = useMemo(() => timeOfDay(), []);
 
-  const filteredExercises = selectedCategory === 'all' 
-    ? breathingExercises 
-    : breathingExercises.filter(exercise => exercise.category === selectedCategory);
+  const recommended = useMemo(() => {
+    const id = recommendedFor(tod);
+    return breathingExercises.find((e) => e.id === id) || breathingExercises[0];
+  }, [tod]);
 
-  const popularExercises = [
-    breathingExercises.find(e => e.id === 'four_seven_eight'),
-    breathingExercises.find(e => e.id === 'box_breathing'),
-    breathingExercises.find(e => e.id === 'wim_hof'),
-    breathingExercises.find(e => e.id === 'coherent_breathing')
-  ].filter(Boolean) as BreathingExercise[];
+  const visible = useMemo(() => {
+    if (tab === 'all') return breathingExercises;
+    return breathingExercises.filter((e) => e.category === tab);
+  }, [tab]);
 
-  const getExerciseEmoji = (category: string) => {
-    switch (category) {
-      case 'calm': return '😌';
-      case 'energy': return '⚡';
-      case 'focus': return '🎯';
-      case 'sleep': return '🌙';
-      default: return '🫁';
-    }
-  };
+  const TodIcon =
+    tod === 'morning' ? Sun : tod === 'afternoon' ? CloudSun : tod === 'evening' ? Moon : Star;
 
   return (
-    <div className="home-screen">
-      {/* Header */}
-      <motion.div 
-        className="header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <h1 className="app-title">Breathe</h1>
-        <button className="menu-button">
-          <Settings size={20} />
-        </button>
-      </motion.div>
+    <div className={`home-screen tod-${tod}`}>
+      <div className="home-backdrop" aria-hidden />
 
-      {/* Quick Categories */}
-      <motion.div 
-        className="quick-categories"
-        initial={{ opacity: 0, y: 20 }}
+      <motion.header
+        className="home-header"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="home-greet">
+          <TodIcon size={18} strokeWidth={1.6} />
+          <span>{greeting(tod)}</span>
+        </div>
+        <h1 className="home-title">Take one deep breath.</h1>
+      </motion.header>
+
+      <motion.button
+        className="recommended-card"
+        onClick={() => onStartExercise(recommended)}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.99 }}
+        style={{ ['--accent' as any]: accentFor(recommended.category) }}
       >
-        <PixelCard 
-          variant="calm" 
-          className="quick-category calm"
-          onClick={() => setSelectedCategory(CATEGORIES.CALM)}
-        >
-          <div className="pixel-card-content">
-            <span className="pixel-card-icon">😌</span>
-            <span className="pixel-card-title">Calm</span>
-          </div>
-        </PixelCard>
-        
-        <PixelCard 
-          variant="energy" 
-          className="quick-category energy"
-          onClick={() => setSelectedCategory(CATEGORIES.ENERGY)}
-        >
-          <div className="pixel-card-content">
-            <span className="pixel-card-icon">⚡</span>
-            <span className="pixel-card-title">Energy</span>
-          </div>
-        </PixelCard>
-        
-        <PixelCard 
-          variant="focus" 
-          className="quick-category focus"
-          onClick={() => setSelectedCategory(CATEGORIES.FOCUS)}
-        >
-          <div className="pixel-card-content">
-            <span className="pixel-card-icon">🎯</span>
-            <span className="pixel-card-title">Focus</span>
-          </div>
-        </PixelCard>
-        
-        <PixelCard 
-          variant="sleep" 
-          className="quick-category sleep"
-          onClick={() => setSelectedCategory(CATEGORIES.SLEEP)}
-        >
-          <div className="pixel-card-content">
-            <span className="pixel-card-icon">🌙</span>
-            <span className="pixel-card-title">Sleep</span>
-          </div>
-        </PixelCard>
-      </motion.div>
+        <div className="recommended-orb" aria-hidden />
+        <div className="recommended-body">
+          <span className="recommended-eyebrow">Recommended for you</span>
+          <span className="recommended-name">{recommended.name}</span>
+          <span className="recommended-caption">{recommended.description}</span>
+          <span className="recommended-meta">
+            {recommended.duration ? `${recommended.duration} min` : `${recommended.rounds ?? 8} rounds`}
+            <span className="dot" />
+            {recommended.category}
+          </span>
+        </div>
+      </motion.button>
 
-      {/* Section Header */}
-      <motion.div 
-        className="section-header"
+      <div className="tabs">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            className={`tab ${tab === t.id ? 'active' : ''}`}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <motion.ul
+        className="exercise-list"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        transition={{ duration: 0.4, delay: 0.15 }}
       >
-        <h2 className="section-title">
-          {selectedCategory === 'all' ? 'Popular Exercises' : `${getCategoryInfo(selectedCategory).name} Exercises`}
-        </h2>
-      </motion.div>
-
-      {/* Exercises List */}
-      <motion.div 
-        className="exercises-list"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        {(selectedCategory === 'all' ? popularExercises : filteredExercises).map((exercise, index) => (
-          <motion.div
+        {visible.map((exercise, i) => (
+          <motion.li
             key={exercise.id}
-            className="exercise-item"
-            initial={{ opacity: 0, y: 20 }}
+            className="exercise-row"
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 * index }}
-            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ duration: 0.3, delay: Math.min(i * 0.03, 0.4) }}
             whileTap={{ scale: 0.98 }}
             onClick={() => onStartExercise(exercise)}
+            style={{ ['--accent' as any]: accentFor(exercise.category) }}
           >
-            <div className="exercise-icon">
-              <span className="exercise-emoji">
-                {getExerciseEmoji(exercise.category)}
-              </span>
+            <span className="exercise-accent" aria-hidden />
+            <div className="exercise-main">
+              <span className="exercise-name">{exercise.name}</span>
+              <span className="exercise-sub">{exercise.description}</span>
             </div>
-            <div className="exercise-info">
-              <h3 className="exercise-title">{exercise.name}</h3>
-              <p className="exercise-subtitle">{exercise.description}</p>
-            </div>
-            <div className="exercise-duration">
-              {exercise.duration ? `${exercise.duration} min` : `${exercise.rounds || 8} rounds`}
-            </div>
-          </motion.div>
+            <span className="exercise-meta">
+              {exercise.duration
+                ? `${exercise.duration}m`
+                : exercise.rounds
+                ? `${exercise.rounds}×`
+                : ''}
+            </span>
+          </motion.li>
         ))}
-      </motion.div>
+      </motion.ul>
 
-      {/* Bottom Navigation */}
-      <motion.div 
-        className="bottom-nav"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <button className="nav-item active">
-          <span className="nav-icon">🏠</span>
-          <span className="nav-label">Home</span>
-        </button>
-        <button className="nav-item" onClick={() => setSelectedCategory('all')}>
-          <span className="nav-icon">🫁</span>
-          <span className="nav-label">Breathe</span>
-        </button>
-        <button className="nav-item" onClick={() => setSelectedCategory(CATEGORIES.SLEEP)}>
-          <span className="nav-icon">🌙</span>
-          <span className="nav-label">Sleep</span>
-        </button>
-        <button className="nav-item">
-          <span className="nav-icon">🎓</span>
-          <span className="nav-label">Learn</span>
-        </button>
-      </motion.div>
+      <div className="home-footer">
+        <span>{breathingExercises.length} exercises · works offline</span>
+      </div>
     </div>
   );
 };

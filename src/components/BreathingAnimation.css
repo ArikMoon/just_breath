@@ -1,252 +1,39 @@
-.breathing-animation {
+.orb-stage {
   position: relative;
-  width: 240px;
-  height: 240px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 2rem 0;
+  width: min(68vw, 320px);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
 }
 
-.breathing-circle {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border: 2px solid #93c5fd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: 
-    0 8px 32px rgba(59, 130, 246, 0.15),
-    inset 0 2px 8px rgba(255, 255, 255, 0.8);
-  transition: all 0.3s ease;
-}
-
-.breathing-circle.inhaling {
-  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
-  border-color: #3b82f6;
-  box-shadow: 
-    0 12px 40px rgba(59, 130, 246, 0.25),
-    inset 0 2px 8px rgba(255, 255, 255, 0.9);
-}
-
-.breathing-circle.exhaling {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-color: #cbd5e1;
-  box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.1),
-    inset 0 2px 8px rgba(255, 255, 255, 0.7);
-}
-
-.breathing-circle.holding {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-color: #f59e0b;
-  box-shadow: 
-    0 8px 32px rgba(245, 158, 11, 0.2),
-    inset 0 2px 8px rgba(255, 255, 255, 0.8);
-}
-
-.circle-inner {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-
-.circle-core {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-/* Breathing rings */
-.breathing-ring {
+.orb-ring,
+.orb-ring-2 {
   position: absolute;
+  inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(59, 130, 246, 0.3);
-  animation: breathingRing 4s ease-in-out infinite;
+  border: 1px solid color-mix(in oklab, var(--exercise-accent, #fff) 50%, transparent);
+  pointer-events: none;
+}
+.orb-ring-2 {
+  border-color: color-mix(in oklab, var(--exercise-accent, #fff) 30%, transparent);
 }
 
-.breathing-ring:nth-child(1) {
-  width: 200px;
-  height: 200px;
-  animation-delay: 0s;
-}
-
-.breathing-ring:nth-child(2) {
-  width: 220px;
-  height: 220px;
-  animation-delay: 0.5s;
-}
-
-.breathing-ring:nth-child(3) {
-  width: 240px;
-  height: 240px;
-  animation-delay: 1s;
-}
-
-@keyframes breathingRing {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.1);
-  }
-}
-
-/* Progress arc */
-.progress-arc {
+.orb-core {
   position: absolute;
-  width: 180px;
-  height: 180px;
+  inset: 14%;
   border-radius: 50%;
-  border: 3px solid transparent;
-  border-top-color: #3b82f6;
-  transform: rotate(-90deg);
-  transition: all 0.3s ease;
-}
-
-/* Pulse effect for active state */
-.breathing-animation.active .breathing-circle {
-  animation: breathingPulse 1s ease-in-out infinite alternate;
-}
-
-@keyframes breathingPulse {
-  0% {
-    box-shadow: 
-      0 8px 32px rgba(59, 130, 246, 0.15),
-      inset 0 2px 8px rgba(255, 255, 255, 0.8);
-  }
-  100% {
-    box-shadow: 
-      0 12px 40px rgba(59, 130, 246, 0.25),
-      inset 0 2px 8px rgba(255, 255, 255, 0.9);
-  }
-}
-
-/* Phase indicators */
-.phase-indicators {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.5rem;
-}
-
-.phase-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #cbd5e1;
-  transition: all 0.3s ease;
-}
-
-.phase-dot.active {
-  background: #3b82f6;
-  transform: scale(1.3);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .breathing-animation {
-    width: 200px;
-    height: 200px;
-  }
-  
-  .breathing-circle {
-    width: 140px;
-    height: 140px;
-  }
-  
-  .circle-inner {
-    width: 90px;
-    height: 90px;
-  }
-  
-  .circle-core {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .breathing-ring:nth-child(1) {
-    width: 170px;
-    height: 170px;
-  }
-  
-  .breathing-ring:nth-child(2) {
-    width: 190px;
-    height: 190px;
-  }
-  
-  .breathing-ring:nth-child(3) {
-    width: 210px;
-    height: 210px;
-  }
-  
-  .progress-arc {
-    width: 160px;
-    height: 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .breathing-animation {
-    width: 180px;
-    height: 180px;
-    margin: 1.5rem 0;
-  }
-  
-  .breathing-circle {
-    width: 120px;
-    height: 120px;
-  }
-  
-  .circle-inner {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .circle-core {
-    width: 45px;
-    height: 45px;
-  }
-  
-  .breathing-ring:nth-child(1) {
-    width: 150px;
-    height: 150px;
-  }
-  
-  .breathing-ring:nth-child(2) {
-    width: 170px;
-    height: 170px;
-  }
-  
-  .breathing-ring:nth-child(3) {
-    width: 190px;
-    height: 190px;
-  }
-  
-  .progress-arc {
-    width: 140px;
-    height: 140px;
-  }
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      color-mix(in oklab, var(--exercise-accent, #fff) 80%, white) 0%,
+      color-mix(in oklab, var(--exercise-accent, #fff) 55%, black) 60%,
+      color-mix(in oklab, var(--exercise-accent, #fff) 35%, black) 100%
+    );
+  box-shadow:
+    0 0 calc(80px * var(--glow, 0.6)) color-mix(in oklab, var(--exercise-accent, #fff) 55%, transparent),
+    0 0 calc(160px * var(--glow, 0.6)) color-mix(in oklab, var(--exercise-accent, #fff) 35%, transparent),
+    inset 0 -14px 42px rgba(0, 0, 0, 0.4);
+  filter: saturate(1.05);
+  will-change: transform, box-shadow;
 }

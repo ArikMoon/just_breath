@@ -8,116 +8,56 @@ interface BreathingAnimationProps {
   isActive: boolean;
 }
 
-const BreathingAnimation: React.FC<BreathingAnimationProps> = ({ 
-  phase, 
-  progress, 
-  isActive 
-}) => {
-  const getScale = () => {
-    if (!isActive) return 1;
-    
-    switch (phase) {
-      case 'inhale':
-        return 1 + (progress / 100) * 0.5; // Scale from 1 to 1.5
-      case 'hold':
-        return 1.5; // Stay expanded
-      case 'exhale':
-        return 1.5 - (progress / 100) * 0.5; // Scale from 1.5 to 1
-      case 'holdEmpty':
-        return 1; // Stay contracted
-      default:
-        return 1;
-    }
-  };
+const MIN = 0.78;
+const MAX = 1.18;
 
-  const getOpacity = () => {
-    if (!isActive) return 0.7;
-    
+const BreathingAnimation: React.FC<BreathingAnimationProps> = ({ phase, progress, isActive }) => {
+  const p = Math.min(1, Math.max(0, progress / 100));
+
+  let scale = MIN;
+  let glow = 0.55;
+  if (!isActive) {
+    scale = (MIN + MAX) / 2;
+    glow = 0.45;
+  } else {
     switch (phase) {
       case 'inhale':
-        return 0.7 + (progress / 100) * 0.3; // Fade from 0.7 to 1
+        scale = MIN + (MAX - MIN) * p;
+        glow = 0.55 + 0.35 * p;
+        break;
       case 'hold':
-        return 1; // Stay bright
+        scale = MAX;
+        glow = 0.9;
+        break;
       case 'exhale':
-        return 1 - (progress / 100) * 0.3; // Fade from 1 to 0.7
+        scale = MAX - (MAX - MIN) * p;
+        glow = 0.9 - 0.4 * p;
+        break;
       case 'holdEmpty':
-        return 0.7; // Stay dim
-      default:
-        return 0.7;
+        scale = MIN;
+        glow = 0.5;
+        break;
     }
-  };
+  }
 
   return (
-    <div className="breathing-animation">
+    <div className="orb-stage">
       <motion.div
-        className="breathing-circle"
-        animate={{
-          scale: getScale(),
-          opacity: getOpacity(),
-        }}
-        transition={{
-          duration: 0.1,
-          ease: "easeInOut"
-        }}
-      >
-        <div className="circle-inner">
-          <div className="circle-core" />
-        </div>
-        
-        {/* Ripple effects */}
-        {isActive && (
-          <>
-            <motion.div
-              className="ripple ripple-1"
-              animate={{
-                scale: [1, 2, 1],
-                opacity: [0.3, 0, 0.3],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-            <motion.div
-              className="ripple ripple-2"
-              animate={{
-                scale: [1, 2.5, 1],
-                opacity: [0.2, 0, 0.2],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                delay: 1,
-                ease: "easeInOut"
-              }}
-            />
-          </>
-        )}
-      </motion.div>
-      
-      {/* Breathing guide dots */}
-      <div className="breathing-guide">
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="guide-dot"
-            style={{
-              transform: `rotate(${i * 45}deg) translateY(-80px)`,
-            }}
-            animate={{
-              scale: isActive ? [1, 1.2, 1] : 1,
-              opacity: isActive ? [0.5, 1, 0.5] : 0.3,
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: i * 0.1,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-      </div>
+        className="orb-ring"
+        animate={{ scale: scale * 1.14, opacity: 0.35 }}
+        transition={{ duration: 0.9, ease: [0.42, 0, 0.2, 1] }}
+      />
+      <motion.div
+        className="orb-ring orb-ring-2"
+        animate={{ scale: scale * 1.32, opacity: 0.2 }}
+        transition={{ duration: 0.9, ease: [0.42, 0, 0.2, 1] }}
+      />
+      <motion.div
+        className="orb-core"
+        animate={{ scale, ['--glow' as any]: glow }}
+        transition={{ duration: 0.9, ease: [0.42, 0, 0.2, 1] }}
+        style={{ ['--glow' as any]: glow }}
+      />
     </div>
   );
 };
